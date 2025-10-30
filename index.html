@@ -68,26 +68,17 @@
                         <li>Adoptat de Mozilla în 2009</li>
                         <li>Anunțat oficial în 2010</li>
                         <li><em>Self-hosted</em> din 2011</li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>Schimbări drastice în primii ani</li>
                         <li><em>Garbage-collected</em> până în 2013</li>
                         <li>Versiunea 1.0 (stabilă) a apărut în mai 2015</li>
-                        <li>
-                            Versiunile ulterioare sunt compatibile cu codul
-                            vechi
-                        </li>
-                        <li>Azi: Rust 1.91 (octombrie 2025)</li>
                         <li>O versiune nouă la fiecare 6 săptămâni</li>
+                        <li>Azi: Rust 1.91 (octombrie 2025)</li>
                     </ul>
                 </section>
                 <section>
                     <ul>
                         <li>
                             Comparabil cu C și C++, dar pune accentul pe
-                            eliminarea unor categorii de erori
+                            eliminarea unor categorii întregi de erori
                         </li>
                         <li>
                             Relativ nou, deci nu e încă popular în toate
@@ -170,7 +161,7 @@
                     </code></pre>
                 </section>
                 <section>
-                    <pre class="fragment"><code class="language-toml" data-trim>
+                    <pre><code class="language-toml" data-trim>
                         [package]
                         name = "hello"
                         version = "0.1.0"
@@ -180,9 +171,9 @@
                         gdal = "0.18.0"
                     </code></pre>
                     <pre class="fragment"><code class="language-rust" data-trim>
-                        use gdal::Dataset;
+                        use gdal::{Dataset, errors::GdalError};
 
-                        fn main() -> Result<(), gdal::errors::GdalError> {
+                        fn main() -> Result<(), GdalError> {
                             let ds = Dataset::open("in.tif")?;
                             for (index, band) in ds.rasterbands().enumerate() {
                                 let band = band?;
@@ -215,17 +206,12 @@
                         </li>
                         <li>
                             Operațiile au nevoie de tipuri de date compatibile
-                            (similar cu C, Python, nu JavaScrip)
+                            (similar cu C, Python, nu JavaScript)
                         </li>
                         <li class="fragment"><em>Strong, static typing</em></li>
                         <li class="fragment">
                             Tipurile variabilelor locale pot fi în general
                             deduse de compilator
-                        </li>
-                        <li class="fragment">
-                            Scopul unui sistem de tipuri este să respingă
-                            programe incorecte, în timp ce le acceptă pe cele
-                            corecte
                         </li>
                     </ul>
                 </section>
@@ -311,10 +297,6 @@
                     <h3>De ce Rust?</h3>
                     <ul>
                         <li>
-                            Mozilla: 70% din problemele de securitate sunt
-                            cauzate de gestiunea greșită a memoriei
-                        </li>
-                        <li class="fragment">
                             <a
                                 href="https://www.zdnet.com/article/microsoft-70-percent-of-all-security-bugs-are-memory-safety-issues/"
                                 rel="noopener noreferrer"
@@ -337,15 +319,57 @@
                                 href="https://hacks.mozilla.org/2019/02/rewriting-a-browser-component-in-rust/"
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                >Google</a
-                            >Mozilla: 70% din problemele de securitate din
-                            Chrome sunt cauzate de gestiunea greșită a memoriei
+                                >Mozilla</a
+                            >: 74% din problemele de securitate din Firefox sunt
+                            cauzate de gestiunea greșită a memoriei
                         </li>
                     </ul>
                 </section>
                 <section>
-                    <h3><em>Soluțiile Rust</em></h3>
+                    <h3>De ce Rust?</h3>
                     <ul>
+                        <li>Securitate</li>
+                        <li>Limbaj modern</li>
+                        <li>
+                            <em>Tooling</em> prietenos (compilator,
+                            <em>linter</em>, <em>formatter</em>, suport pentru
+                            IDE-uri)
+                        </li>
+                        <li>Cod performant</li>
+                        <li>Biblioteci</li>
+                        <li>Accesibilitate</li>
+                        <li>Documentație</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>De ce Rust?</h3>
+                    <ul>
+                        <li>
+                            Limbaj de nivel înalt, poate fi folosit ca Python,
+                            performanță comparabilă cu C și C++
+                        </li>
+                        <li>
+                            Compilatorul previne nu numai
+                            <code class="language-python">NameError</code>, ci
+                            și erori de logică
+                        </li>
+                        <li>Fără<sup>*</sup> <code>SIGSEGV</code> &c.</li>
+                        <li>
+                            Interoperabilitate, poate folosi și expune ABI-ul C
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <h3><em>Abordarea Rust</em></h3>
+                    <ul>
+                        <li>
+                            <q
+                                ><em
+                                    >Technology from the past come to save the
+                                    future from itself</em
+                                ></q
+                            >
+                        </li>
                         <li>
                             Memoria este gestionată automat (<em>ownership</em>,
                             <em>reference counting</em>)
@@ -355,12 +379,15 @@
                             verificate
                         </li>
                         <li class="fragment">
-                            Rust are două tipuri de referințe: partajate și
-                            exclusive
+                            Tipurile de date declară explicit dacă pot fi mutate
+                            de pe un <em>thread</em> pe altul, sau dacă pot fi
+                            folosite concurent
                         </li>
-                        <pre
-                            class="fragment"
-                        ><code class="language-cpp" data-trim>
+                    </ul>
+                </section>
+                <section>
+                    <h3><em>Aliasing</em></h3>
+                    <pre><code class="language-cpp" data-trim>
                             void f(int *p, int *q) {
                                 *p += *q;
                                 *p += *q;
@@ -372,12 +399,21 @@
 
                             f(&x, &x);
                         </code></pre>
+                    <ul>
+                        <li class="fragment">
+                            <code class="language-cpp">f</code> și
+                            <code class="language-cpp">g</code> nu sunt
+                            echivalente deoarece
+                            <code class="language-cpp">p</code> și
+                            <code class="language-cpp">q</code> pot indica spre
+                            aceeași valoare
+                        </li>
+                        <li class="fragment">
+                            <em>Aliasing</em>-ul este una din dificultățile
+                            principale cu care ne întâlnim în ingineria
+                            programării.
+                        </li>
                     </ul>
-                    <li class="fragment">
-                        Tipurile de date declară explicit dacă pot fi mutate de
-                        pe un <em>thread</em> pe altul, sau dacă pot fi folosite
-                        concurent
-                    </li>
                 </section>
                 <section>
                     <h3><em>Borrow checker</em></h3>
@@ -404,20 +440,29 @@
                                 last_name: &buffer[4..],
                             };
                         </code></pre>
+                        <li class="fragment">
+                            Rust are două tipuri de referințe: partajate și
+                            exclusive
+                        </li>
                     </ul>
                 </section>
-                <!--  ................................. -->
                 <section>
                     <h3>Constelația Sentinel-2</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 40%; font-size: 0.7em">
-                            <li>Constelație de trei sateliți</li>
+                            <li>
+                                Constelație de trei sateliți, ESA (Copernicus)
+                            </li>
                             <li>
                                 Perioadă de revizitare de ~5 zile (dar atenție,
                                 nori!)
                             </li>
                             <li>Scene de ~110 × 110 km²</li>
                             <li>Suntem în celula 35TMK</li>
+                            <li>
+                                Datele sunt disponibile pentru oricine, fără
+                                restricții sau cost
+                            </li>
                         </ul>
                         <img
                             src="images/sentinel-2-grid.png"
@@ -432,7 +477,7 @@
                             <li>4 benzi @ 10 m (RGB, NIR)</li>
                             <li>6 benzi @ 20 m (NIR, SWIR)</li>
                             <li>
-                                3 benzi @ 60 m (aerosoli, vapori de apă, nori
+                                3 benzi @ 60 m (aerosoli, vapori de apă
                                 <em>cirrus</em>)
                             </li>
                         </ul>
@@ -451,25 +496,26 @@
                         </figure>
                     </div>
                 </section>
+                <!--  ................................. -->
                 <section>
                     <h3>
-                        Recognizing
-                        <s style="text-decoration-color: red">Trees</s>
-                        Vegetation from Space
+                        Detecția
+                        <s style="text-decoration-color: red">arborilor</s>
+                        vegetației din spațiu
                     </h3>
                     <ul>
                         <li>
-                            Vegetation is green, but so can be water, roofs,
-                            shadows &c.
+                            Vegetația este verde, dar la fel poate pot părea și
+                            apa, umberele, acoperișurile &c.
                         </li>
-                        <li class="fragment">Why are plants green?</li>
-                        <li class="fragment">What is <em>green</em> anyway?</li>
+                        <li class="fragment">De ce sunt plantele verzi?</li>
+                        <li class="fragment">Ce înseamnă verde?</li>
                         <li class="fragment">
-                            Sunlight is white and has all the visible colors
+                            Lumina soarelui e albă și conține toate culorile
                         </li>
                         <li class="fragment">
-                            Green things reflect green and absorb the other
-                            colors
+                            Obiectele verzi reflectă verdele și absorb celelalte
+                            culori
                         </li>
                     </ul>
                 </section>
@@ -477,23 +523,23 @@
                     <img src="images/dsotm.png" style="width: 100%" />
                 </section>
                 <section>
-                    <h3>Chlorophyll and the NDVI</h3>
+                    <h3>Clorofila &mdash; NDVI</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 45%; font-size: 0.5em">
-                            <li>Vegetation is green because of chlorophyll</li>
+                            <li>Vegetația este verde datorită clorofilei</li>
                             <li class="fragment">
-                                Chlorophyll absorbs blue and red
+                                Clorofila absoarbe lumina albastră și
+                                <strong>roșie</strong>&hellip;
                             </li>
                             <li class="fragment">
-                                Chlorophyll reflects green
-                                <span class="fragment">and infrared</span>
+                                &hellip; și reflectă verdele
+                                <span class="fragment"
+                                    >și <strong>infraroșul</strong></span
+                                >
                             </li>
                             <li class="fragment">
-                                Look for things that absorb red and reflect
-                                infrared
-                            </li>
-                            <li class="fragment">
-                                Normalized Difference Vegetation Index (NDVI)
+                                <em>Normalized Difference Vegetation Index</em>
+                                (NDVI)
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="block"
@@ -523,7 +569,7 @@
                                 style="width: 100%"
                             />
                             <figcaption style="font-size: 0.3em; color: #aaa">
-                                Source:
+                                Sursă:
                                 <a
                                     href="https://en.wikipedia.org/wiki/File:Chlorophyll_ab_spectra-en.svg"
                                     >Wikipedia</a
@@ -533,7 +579,7 @@
                     </div>
                 </section>
                 <section>
-                    <h3>Interlude: True Color Composite</h3>
+                    <h3>Interludiu: Compozit RGB</h3>
                     <figure>
                         <img
                             src="images/s2-r-g-b.png"
@@ -541,11 +587,11 @@
                         />
                     </figure>
                     <figcaption style="font-size: 0.3em; color: #aaa">
-                        Sentinel-2 true color (RGB) composite, 35TMK, 2024-06-23
+                        Sentinel-2 RGB, 35TMK, 2024-06-23
                     </figcaption>
                 </section>
                 <section>
-                    <h3>Interlude: False Color Composite</h3>
+                    <h3>Interludiu: Compozit NIR-R-G</h3>
                     <figure>
                         <img
                             src="images/s2-nir-r-g.png"
@@ -553,33 +599,32 @@
                         />
                     </figure>
                     <figcaption style="font-size: 0.3em; color: #aaa">
-                        Sentinel-2 false color (NIR-R-G) composite, 35TMK,
-                        2024-06-23
+                        Sentinel-2 NIR-R-G, 35TMK, 2024-06-23
                     </figcaption>
                 </section>
                 <section>
                     <h3>NDVI</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 45%; font-size: 0.5em">
-                            <li>Shows photosynthetically active vegetation</li>
+                            <li>Arată vegetația activă dpdv. fotosintetic</li>
                             <li>
-                                From −1 to 1, but negative values are not
-                                interesting
+                                De la -1 la 1, dar valorile negative sunt mai
+                                puțin interesante
                             </li>
                             <li>
-                                Bare soils
+                                Soluri fără vegetație
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="inline"
                                 >
                                     <mo>∼</mo><mn>0.2</mn> </math
-                                >, sparse vegetation
+                                >, vegetație rară
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="inline"
                                 >
                                     <mo>∼</mo><mn>0.3</mn> </math
-                                >, dense vegetation
+                                >, vegetație densă
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="inline"
@@ -594,7 +639,7 @@
                                 style="width: 100%"
                             />
                             <figcaption style="font-size: 0.3em; color: #aaa">
-                                Sentinel-2 NDVI color ramp, 35TMK, 2024-06-23
+                                Sentinel-2 NDVI, 35TMK, 2024-06-23
                             </figcaption>
                         </figure>
                     </div>
@@ -604,7 +649,7 @@
                     <figure>
                         <img src="images/ndvi-crops.png" />
                         <figcaption style="font-size: 0.3em; color: #aaa">
-                            Source:
+                            Sursă:
                             <a href="https://doi.org/10.48550/arXiv.2111.02682"
                                 >TimeMatch: Unsupervised Cross-Region Adaptation
                                 by Temporal Shift Estimation</a
@@ -613,21 +658,20 @@
                     </figure>
                 </section>
                 <section>
-                    <h3>NDVI (3 Date Composite)</h3>
+                    <h3>NDVI (compozit trei date)</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 45%; font-size: 0.5em">
                             <li>
-                                Red / magenta: high NDVI in spring, early crops
+                                Roșu / magenta: NDVI mare primăvara, culturi
+                                timpurii
                             </li>
-                            <li>Green: high NDVI in summer, summer crops</li>
+                            <li>Verde: NDVI mare vara, culturi de vară</li>
+                            <li>Galben: NDVI mare primăvara și vara, copaci</li>
                             <li>
-                                Yellow: high NDVI in spring and summer, trees
+                                Albastru / cian: NDVI mare vara și toamna,
+                                culturi irigate
                             </li>
-                            <li>
-                                Blue / cyan: high NDVI in summer and autumn,
-                                irrigated crops
-                            </li>
-                            <li>Black: not vegetation</li>
+                            <li>Negru: vegetație absentă</li>
                         </ul>
                         <figure style="flex: 50%; text-align: center">
                             <img
@@ -635,36 +679,14 @@
                                 style="width: 100%"
                             />
                             <figcaption style="font-size: 0.3em; color: #aaa">
-                                Sentinel-2 NDVI composite, 35TMK, 2024-04-14,
+                                Sentinel-2 NDVI compozit, 35TMK, 2024-04-14,
                                 2024-07-08, 2024-10-26
                             </figcaption>
                         </figure>
                     </div>
                 </section>
                 <section>
-                    <h3>Why Rust?</h3>
-                    <ul style="font-size: 0.7em">
-                        <li>
-                            High-level, you can use it like Python, nobody will
-                            complain
-                        </li>
-                        <li>
-                            Easy to use, cf. <code>NameError</code> after
-                            running for half a day
-                        </li>
-                        <li>
-                            Fast, on-par with C, even naïve code might be fast
-                            enough
-                        </li>
-                        <li>
-                            Memory-safe, no <code>SIGSEGV</code>s, no data races
-                        </li>
-                        <li>Good libraries, and can call into any C library</li>
-                        <li>Good tooling and documentation</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Reading Rasters in Rust</h3>
+                    <h3>Citirea rasterelor în Rust</h3>
                     <div
                         style="
                             display: flex;
@@ -675,19 +697,22 @@
                     >
                         <ul style="flex: 45%">
                             <li>
-                                We use GDAL, <em>the</em> geospatial I/O library
+                                Folosim GDAL, cea mai cunoscută bibliotecă de
+                                I/E pentru date geospațiale
                             </li>
                             <li>
-                                New (GDAL 3.10) dataset thread-safety support,
-                                coming soon to Rust
+                                Suport pentru accesul concurent la date, nou în
+                                GDAL 3.10, disponibil în curând în biblioteca
+                                Rust
                             </li>
                             <li>
-                                Can read regions of the input, to save memory
+                                Putem citi regiuni din intrare, pentru a
+                                economisi memoria
                             </li>
                         </ul>
                         <div style="flex: 55%; text-align: center">
                             <pre>
-                                <code>use gdal::{Dataset, GdalOpenFlags::*};
+                                <code class="language-rust">use gdal::{Dataset, GdalOpenFlags::*};
 
 let open_flags = GDAL_OF_RASTER | GDAL_OF_THREAD_SAFE;
 let ds = Dataset::open_ex(
@@ -721,27 +746,28 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                     </div>
                 </section>
                 <section>
-                    <h3>Raster Layouts</h3>
+                    <h3>Organizarea rasterelor</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 45%; font-size: 0.4em">
                             <li>
-                                Generally, rasters use one of two pixel data
-                                layouts:
+                                În general, rasterele sunt organizate într-unul
+                                din două moduri:
                                 <ul>
-                                    <li>Tiles</li>
-                                    <li>Strips: rows written in order</li>
+                                    <li><em>Tiles</em> (blocuri)</li>
+                                    <li><em>Strips</em> (linii)</li>
                                 </ul>
                             </li>
                             <li class="fragment">
-                                Tiled layouts are usually more efficient because
-                                they allow processing of rectangular regions
+                                Organizarea în blocuri e mai eficientă deoarece
+                                facilitează procesarea regiunilor
+                                dreptunghiulare
                             </li>
                             <li class="fragment">
-                                This is especially true for visualization
+                                Valabil mai ales pentru vizualizare
                             </li>
                             <li class="fragment">
-                                Sentinel-2 uses JPEG 2000 (tiled, small, but
-                                very slow to decode)
+                                Sentinel-2 folosește JPEG 2000 (organizat în
+                                blocuri, fișiere mici, dar decodare lentă)
                             </li>
                         </ul>
                         <figure style="flex: 50%; text-align: center">
@@ -752,30 +778,30 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                             <figcaption style="font-size: 0.3em; color: #aaa">
                                 <a
                                     href="https://kokoalberti.com/articles/geotiff-compression-optimization-guide/"
-                                    >Source</a
+                                    >Sursă</a
                                 >
                             </figcaption>
                         </figure>
                     </div>
                 </section>
                 <section>
-                    <h3>A Rough Sketch</h3>
+                    <h3>Schiță a procesării</h3>
                     <ul style="font-size: 0.7em">
                         <li>
-                            Query products for desired time interval (e.g. CDSE
-                            STAC API)
+                            Interogarea unui catalog de produse pentru un
+                            interval de timp dorit
                         </li>
                         <li>
-                            Take rectangular blocks from each input
+                            Parcurgem fiecare bloc din fiecare intrare
                             <ul>
-                                <li>first block from each input</li>
-                                <li>second block from each input</li>
+                                <li>primul bloc din fiecare intrare</li>
+                                <li>al doilea bloc din fiecare intrare</li>
                                 <li>&hellip;</li>
                             </ul>
                         </li>
                         <li>
-                            Read the blocks on a thread pool, send on a channel
-                            (queue)
+                            Citim blocuri de pe mai multe fire de execuție, le
+                            trimitem pe un canal (coadă)
                         </li>
                         <li>
                             Single receiver thread reads dequeues blocks,
