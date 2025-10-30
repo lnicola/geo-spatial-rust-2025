@@ -63,18 +63,24 @@
                     </blockquote>
                 </section>
                 <section>
+                    <h3>Rust</h3>
                     <ul>
                         <li>Proiect personal al lui Graydon Hoare (2006)</li>
-                        <li>Adoptat de Mozilla în 2009</li>
-                        <li>Anunțat oficial în 2010</li>
+                        <li>Adoptat de Mozilla (2009)</li>
+                        <li>Anunțat oficial (2010)</li>
                         <li><em>Self-hosted</em> din 2011</li>
                         <li><em>Garbage-collected</em> până în 2013</li>
                         <li>Versiunea 1.0 (stabilă) a apărut în mai 2015</li>
                         <li>O versiune nouă la fiecare 6 săptămâni</li>
-                        <li>Azi: Rust 1.91 (octombrie 2025)</li>
+                        <li>Ieri: Rust 1.91 (octombrie 2025)</li>
+                        <li>
+                            Cel mai iubit limbaj (Stack Overflow,
+                            2016&ndash;2025)
+                        </li>
                     </ul>
                 </section>
                 <section>
+                    <h3>Rust</h3>
                     <ul>
                         <li>
                             Comparabil cu C și C++, dar pune accentul pe
@@ -131,13 +137,13 @@
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 >IntelliJ</a
-                            >
+                            >,
                             <a
                                 href="https://zed.dev/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 >Zed</a
-                            >
+                            >,
                             <em>&hellip;</em>
                         </li>
                     </ul>
@@ -265,7 +271,7 @@
                             <code class="language-rust">vec.len()</code>
                         </li>
                         <li class="fragment">
-                            Diferență majoră: nu există moștenire
+                            Diferența majoră: nu există moștenire
                         </li>
                         <pre
                             class="fragment"
@@ -328,7 +334,6 @@
                 <section>
                     <h3>De ce Rust?</h3>
                     <ul>
-                        <li>Securitate</li>
                         <li>Limbaj modern</li>
                         <li>
                             <em>Tooling</em> prietenos (compilator,
@@ -339,14 +344,15 @@
                         <li>Biblioteci</li>
                         <li>Accesibilitate</li>
                         <li>Documentație</li>
+                        <li>Securitate</li>
                     </ul>
                 </section>
                 <section>
                     <h3>De ce Rust?</h3>
                     <ul>
                         <li>
-                            Limbaj de nivel înalt, poate fi folosit ca Python,
-                            performanță comparabilă cu C și C++
+                            Poate fi folosit ca Python, performanță comparabilă
+                            cu C și C++
                         </li>
                         <li>
                             Compilatorul previne nu numai
@@ -354,13 +360,19 @@
                             și erori de logică
                         </li>
                         <li>Fără<sup>*</sup> <code>SIGSEGV</code> &c.</li>
-                        <li>
-                            Interoperabilitate, poate folosi și expune ABI-ul C
-                        </li>
                     </ul>
+                    <div
+                        class="fragment"
+                        style="text-align: left; font-size: 0.7em"
+                    >
+                        <p>
+                            <sup>*</sup> exceptând codul
+                            <code class="language-rust">unsafe</code>
+                        </p>
+                    </div>
                 </section>
                 <section>
-                    <h3><em>Abordarea Rust</em></h3>
+                    <h3>Abordarea Rust</h3>
                     <ul>
                         <li>
                             <q
@@ -380,7 +392,7 @@
                         </li>
                         <li class="fragment">
                             Tipurile de date declară explicit dacă pot fi mutate
-                            de pe un <em>thread</em> pe altul, sau dacă pot fi
+                            de pe un fir de execuție pe altul, sau dacă pot fi
                             folosite concurent
                         </li>
                     </ul>
@@ -408,11 +420,7 @@
                             <code class="language-cpp">q</code> pot indica spre
                             aceeași valoare
                         </li>
-                        <li class="fragment">
-                            <em>Aliasing</em>-ul este una din dificultățile
-                            principale cu care ne întâlnim în ingineria
-                            programării.
-                        </li>
+                        <li class="fragment">Eroare de compilare în Rust</li>
                     </ul>
                 </section>
                 <section>
@@ -447,16 +455,138 @@
                     </ul>
                 </section>
                 <section>
-                    <h3>Constelația Sentinel-2</h3>
+                    <h3>Performanță</h3>
+                    <pre><code class="language-ruby" data-trim>
+                        class ::String
+                          def blank?
+                            /\A[[:space:]]*\z/ == self
+                          end
+                        end
+                    </code></pre>
+                    <pre class="fragment"><code class="language-rust" data-trim>
+                        extern "C" fn fast_blank(buf: &Buf) -> bool {
+                            buf.as_slice().chars().all(|c| c.is_whitespace())
+                        }
+                    </code></pre>
+                </section>
+                <section data-vertical-align-top style="padding: 0">
+                    <div style="display: flex; font-size: 0.7em">
+                        <div style="flex: 1">
+                            <pre
+                                style="height: 70vh"
+                            ><code class="language-c" data-trim>
+                                static VALUE
+                                rb_str_blank_as(VALUE str)
+                                {
+                                  rb_encoding *enc;
+                                  char *s, *e;
+
+                                  enc = STR_ENC_GET(str);
+                                  s = RSTRING_PTR(str);
+                                  if (!s || RSTRING_LEN(str) == 0) return Qtrue;
+
+                                  e = RSTRING_END(str);
+                                  while (s < e) {
+                                    int n;
+                                    unsigned int cc = rb_enc_codepoint_len(s, e, &n, enc);
+
+                                    switch (cc) {
+                                      case 9:
+                                      case 0xa:
+                                      case 0xb:
+                                      case 0xc:
+                                      case 0xd:
+                                      case 0x20:
+                                      case 0x85:
+                                      case 0xa0:
+                                      case 0x1680:
+                                      case 0x2000:
+                                      case 0x2001:
+                                      case 0x2002:
+                                      case 0x2003:
+                                      case 0x2004:
+                                      case 0x2005:
+                                      case 0x2006:
+                                      case 0x2007:
+                                      case 0x2008:
+                                      case 0x2009:
+                                      case 0x200a:
+                                      case 0x2028:
+                                      case 0x2029:
+                                      case 0x202f:
+                                      case 0x205f:
+                                      case 0x3000:
+                                          /* found */
+                                          break;
+                                      default:
+                                          return Qfalse;
+                                    }
+                                    s += n;
+                                  }
+                                  return Qtrue;
+                                }
+                            </code></pre>
+                        </div>
+                        <div style="flex: 1">
+                            <pre
+                                style="height: 70vh"
+                            ><code class="language-c" data-trim>
+                                #define STR_ENC_GET(str) rb_enc_from_index(ENCODING_GET(str))
+
+                                static VALUE
+                                rb_str_blank(VALUE str)
+                                {
+                                  rb_encoding *enc;
+                                  char *s, *e;
+
+                                  enc = STR_ENC_GET(str);
+                                  s = RSTRING_PTR(str);
+                                  if (!s || RSTRING_LEN(str) == 0) return Qtrue;
+
+                                  e = RSTRING_END(str);
+                                  while (s < e) {
+                                    int n;
+                                    unsigned int cc = rb_enc_codepoint_len(s, e, &n, enc);
+
+                                    if (!rb_isspace(cc) && cc != 0) return Qfalse;
+                                    s += n;
+                                  }
+                                  return Qtrue;
+                                }
+                            </code></pre>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Ruby</td>
+                                <td class="right">946K iter/s</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>C</td>
+                                <td class="right">10.5M iter/s</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>Rust</td>
+                                <td class="right">11M iter/s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="fragment" style="font-size: 0.3em; color: #aaa">
+                        Sursă:
+                        <a href="http://intorust.com/tutorial/why-rust/"
+                            >http://intorust.com/tutorial/why-rust/</a
+                        >
+                    </p>
+                </section>
+                <section>
+                    <h3>Copernicus Sentinel-2</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 40%; font-size: 0.7em">
-                            <li>
-                                Constelație de trei sateliți, ESA (Copernicus)
-                            </li>
-                            <li>
-                                Perioadă de revizitare de ~5 zile (dar atenție,
-                                nori!)
-                            </li>
+                            <li>Constelație de trei sateliți, ESA</li>
+                            <li>Revizitare la ~5 zile (⚠️ ☁️)</li>
                             <li>Scene de ~110 × 110 km²</li>
                             <li>Suntem în celula 35TMK</li>
                             <li>
@@ -477,7 +607,7 @@
                             <li>4 benzi @ 10 m (RGB, NIR)</li>
                             <li>6 benzi @ 20 m (NIR, SWIR)</li>
                             <li>
-                                3 benzi @ 60 m (aerosoli, vapori de apă
+                                3 benzi @ 60 m (aerosoli, vapori de apă,
                                 <em>cirrus</em>)
                             </li>
                         </ul>
@@ -496,7 +626,6 @@
                         </figure>
                     </div>
                 </section>
-                <!--  ................................. -->
                 <section>
                     <h3>
                         Detecția
@@ -505,8 +634,8 @@
                     </h3>
                     <ul>
                         <li>
-                            Vegetația este verde, dar la fel poate pot părea și
-                            apa, umberele, acoperișurile &c.
+                            Vegetația este verde, dar la fel pot părea și apa,
+                            umbrele, acoperișurile &c.
                         </li>
                         <li class="fragment">De ce sunt plantele verzi?</li>
                         <li class="fragment">Ce înseamnă verde?</li>
@@ -525,11 +654,11 @@
                 <section>
                     <h3>Clorofila &mdash; NDVI</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
-                        <ul style="flex: 45%; font-size: 0.5em">
+                        <ul style="flex: 45%; font-size: 0.7em">
                             <li>Vegetația este verde datorită clorofilei</li>
                             <li class="fragment">
-                                Clorofila absoarbe lumina albastră și
-                                <strong>roșie</strong>&hellip;
+                                Clorofila absoarbe lumina violet/albastră și
+                                <strong>roșie</strong> &hellip;
                             </li>
                             <li class="fragment">
                                 &hellip; și reflectă verdele
@@ -606,13 +735,12 @@
                     <h3>NDVI</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 45%; font-size: 0.5em">
-                            <li>Arată vegetația activă dpdv. fotosintetic</li>
+                            <li>Arată vegetația activă fotosintetic</li>
                             <li>
-                                De la -1 la 1, dar valorile negative sunt mai
-                                puțin interesante
+                                -1&ndash;1, valorile negative puțin interesante
                             </li>
                             <li>
-                                Soluri fără vegetație
+                                Fără vegetație
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="inline"
@@ -645,7 +773,7 @@
                     </div>
                 </section>
                 <section>
-                    <h3>Crop Phenology</h3>
+                    <h3>Fenologia culturilor</h3>
                     <figure>
                         <img src="images/ndvi-crops.png" />
                         <figcaption style="font-size: 0.3em; color: #aaa">
@@ -658,7 +786,7 @@
                     </figure>
                 </section>
                 <section>
-                    <h3>NDVI (compozit trei date)</h3>
+                    <h3>NDVI (compozit, trei date)</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
                         <ul style="flex: 45%; font-size: 0.5em">
                             <li>
@@ -692,7 +820,7 @@
                             display: flex;
                             align-items: center;
                             gap: 0em;
-                            font-size: 0.5em;
+                            font-size: 0.7em;
                         "
                     >
                         <ul style="flex: 45%">
@@ -748,7 +876,7 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                 <section>
                     <h3>Organizarea rasterelor</h3>
                     <div style="display: flex; align-items: center; gap: 0em">
-                        <ul style="flex: 45%; font-size: 0.4em">
+                        <ul style="flex: 45%; font-size: 0.5em">
                             <li>
                                 În general, rasterele sunt organizate într-unul
                                 din două moduri:
@@ -786,10 +914,10 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                 </section>
                 <section>
                     <h3>Schiță a procesării</h3>
-                    <ul style="font-size: 0.7em">
+                    <ol style="font-size: 0.7em">
                         <li>
-                            Interogarea unui catalog de produse pentru un
-                            interval de timp dorit
+                            Interogăm un catalog de produse pentru un interval
+                            de timp dorit
                         </li>
                         <li>
                             Parcurgem fiecare bloc din fiecare intrare
@@ -800,90 +928,91 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                             </ul>
                         </li>
                         <li>
-                            Citim blocuri de pe mai multe fire de execuție, le
-                            trimitem pe un canal (coadă)
+                            Citim regiuni de pe mai multe fire de execuție, le
+                            trimitem pe un canal
                         </li>
                         <li>
-                            Single receiver thread reads dequeues blocks,
-                            computes mean NDVI, writes to output
+                            Un fir de execuție preia datele, calculează valoarea
+                            medie a NDVI-ului pentru fiecare pixel, și scrie
+                            blocul în fișierul de ieșire
                         </li>
                         <li>
-                            Don't compute the mean directly, but rather the sum
-                            and value count
+                            Acumulăm suma și numărul de valori valide, pe măsură
+                            ce citim regiunile
+                            <span class="fragment"
+                                >fără a păstra datele în memorie</span
+                            >
                         </li>
-                        <li>
-                            This means we can process the read regions
-                            immediately
-                        </li>
-                    </ul>
+                    </ol>
                 </section>
                 <section>
-                    <h3>Some Results</h3>
-                    <ul style="font-size: 0.7em">
+                    <h3>Rezultate</h3>
+                    <ul>
                         <li>
-                            On my PC, 2 minutes for 215 products over one year
+                            2 minute pentru 215 produse, de-a lungul unui an
                         </li>
-                        <li>18.5 GB on disk, 58.3 GB uncompressed</li>
+                        <li>18.5 GB pe disc, 58.3 GB necomprimat</li>
                         <li>
-                            6-8 GB RAM, depending on region size and number of
-                            threads
-                        </li>
-                        <li>
-                            Basically all spent in OpenJPEG, but can saturate 32
-                            cores
+                            6-8 GB RAM, în funcție de dimensiunea regiunilor și
+                            numărul de fire de execuție
                         </li>
                         <li>
-                            On cloud VM, April - November, 100 products, 11
-                            minutes per tile stack
+                            Practic tot timpul petrecut în OpenJPEG, dar poate
+                            satura 32 de procesoare logice
+                        </li>
+                        <li>
+                            Pe o mașină virtuală din <em>cloud</em>, aprilie -
+                            noiembrie, 100 de produse, 11 min per grup de celule
                         </li>
                         <li class="fragment">
-                            3 for processing, 8 minutes to open the files 💀
+                            3 min procesarea, 8 min deschiderea fișierelor
                         </li>
                         <li class="fragment">
-                            After cropping, mosaicking, conversion to 8-bit and
-                            compression: 3.4 GB
+                            După tăiere, mozaicare, conversie la 8 biți și
+                            compresie: 8 GB
                         </li>
                     </ul>
-                    <div class="fragment" style="font-size: 0.7em">
+                    <p class="fragment" style="font-size: 0.7em">
                         <a
                             href="https://matrix.dend.ro/ro-ndvi/"
                             target="_blank"
                             >Demo</a
                         >
-                    </div>
+                    </p>
                 </section>
                 <section>
-                    <h3>Potential Improvements</h3>
-                    <ul style="font-size: 0.7em">
-                        <li>Median NDVI (can't compute online)</li>
-                        <li>Combine with different indices (e.g. EVI)</li>
-                        <li>Multi-date classification</li>
+                    <h3>Îmbunătățiri posibile</h3>
+                    <ul>
                         <li>
-                            Use a proper dataset for classification (e.g. ESA
-                            CCI-LC)
+                            NDVI median, nu mediu (nu poate fi calculat
+                            <em>online</em>)
+                        </li>
+                        <li>Combinarea cu alți indici (EVI)</li>
+                        <li>Clasificare multi-dată</li>
+                        <li>
+                            Folosirea unui set de date potrivit pentru
+                            clasificare și validare (ESA CCI-LC)
                         </li>
                     </ul>
                 </section>
                 <section>
                     <h3>GeoRust</h3>
-                    <ul style="font-size: 0.7em">
+                    <ul>
+                        <li>Organizație pentru proiecte GIS</li>
                         <li>
-                            Umbrella organization covering different Rust GIS
-                            projects
-                        </li>
-                        <li>
-                            Geometry: <code>geo</code>, <code>geos</code
+                            Geometrie: <code>geo</code>, <code>geos</code
                             ><sup>*</sup>, <code>robust</code>
                         </li>
                         <li>
-                            Spatial indexing (k-NN query): <code>rstar</code>
+                            Indexuri spațiale (k-NN): <code>rstar</code>,
+                            <code>geo-index</code><sup>†</sup>
                         </li>
                         <li>
-                            Coordinate transforms: <code>proj</code
+                            Transformări de coordonate: <code>proj</code
                             ><sup>*</sup>, <code>geodesy</code><sup>†</sup>
                         </li>
                         <li>
-                            Formats: <code>gdal</code><sup>*</sup>,
+                            Formate de date: <code>gdal</code><sup>*</sup>,
                             <code>netcdf</code><sup>*</sup>, <code>gpx</code>,
                             <code>geojson</code>, <code>wkt</code>,
                             <code>wkb</code>, <code>kml</code>,
@@ -892,46 +1021,34 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                             PgSTAC<sup>‡</sup>, GeoTIFF<sup>‡</sup>
                         </li>
                         <li>
-                            Utilities: <code>geozero</code>,
+                            Utilitare: <code>geozero</code>,
                             <code>geocoding</code>, <code>geohash</code>,
                             <code>polyline</code>
                         </li>
-                        <li>Tools: RINEX</li>
+                        <li>Alte unelte: <code>rinex</code></li>
                     </ul>
                     <div style="text-align: left; font-size: 0.7em">
                         <p></p>
-                        <sup>*</sup>bindings<br />
-                        <sup>†</sup>not formally part of GeoRust<br />
-                        <sup>‡</sup> multiple implementations available, some in
-                        GeoRust, some not
+                        <sup>*</sup>interfețe cu biblioteci C<br />
+                        <sup>†</sup>nu sunt sub umbrela GeoRust<br />
+                        <sup>‡</sup>mai multe implementări disponibile, unele în
+                        GeoRust, unele nu
                     </div>
                 </section>
                 <section>
-                    <h3>Resources</h3>
-                    <p style="font-size: 0.7em">Choose your own adventure:</p>
+                    <h3>Resurse</h3>
                     <ul style="font-size: 0.7em">
                         <li><a href="https://gdal.org/">GDAL</a></li>
                         <li><a href="https://georust.org/">GeoRust</a></li>
-                        <li><a href="https://osgeo.org/">OSGeo</a></li>
-                        <li>
-                            <a href="https://geo-spatial.org/"
-                                >geo-spatial.org</a
-                            >
-                        </li>
                         <li><a href="https://rust-lang.org/">Rust</a></li>
-                        <li>
-                            <a href="https://browser.dataspace.copernicus.eu/"
-                                >Copernicus Browser</a
-                            >
-                        </li>
-                        <li>
-                            <a href="https://forum.step.esa.int/"
-                                >ESA STEP Forum</a
-                            >
-                        </li>
                         <li>
                             <a href="https://doc.rust-lang.org/rust-by-example/"
                                 >Rust by Example</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://browser.dataspace.copernicus.eu/"
+                                >Copernicus Browser</a
                             >
                         </li>
                         <li>
@@ -942,7 +1059,21 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                     </ul>
                 </section>
                 <section>
-                    <h3>Thank You!</h3>
+                    <h3>Interoperabilitate</h3>
+                    <ul>
+                        <li>Rust poate folosi și expune ABI-ul C</li>
+                        <li>C: <code>bindgen</code></li>
+                        <li>C++: <code>autocxx</code>, &hellip;</li>
+                        <li>Python: <code>pyo3</code></li>
+                        <li>R: <code>extendr-api</code></li>
+                        <li>Node.js: <code>neon</code></li>
+                        <li>
+                            Kotlin, Swift, Python, Ruby: <code>maturin</code>
+                        </li>
+                        <li>WASM, Go, C#, Dart, Java</li>
+                    </ul>
+                </section>
+                <section>
                     <div
                         style="
                             display: flex;
@@ -955,19 +1086,19 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                         <figure style="width: 45%; text-align: center">
                             <img src="images/georust.png" style="width: 30%" />
                             <figcaption style="font-size: 0.3em; color: #aaa">
-                                GeoRust logo, CC-BY
+                                Logo-ul GeoRust, CC-BY
                             </figcaption>
                         </figure>
                         <figure style="width: 45%; text-align: center">
                             <img src="images/gdal.png" style="width: 30%" />
                             <figcaption style="font-size: 0.3em; color: #aaa">
-                                GDAL logo, MIT
+                                Logo-ul GDAL, MIT
                             </figcaption>
                         </figure>
                         <figure style="width: 45%; text-align: center">
                             <img src="images/osgeo.png" style="width: 30%" />
                             <figcaption style="font-size: 0.3em; color: #aaa">
-                                OSGeo logo
+                                Logo-ul OSGeo
                             </figcaption>
                         </figure>
                         <figure style="width: 45%; text-align: center">
@@ -976,48 +1107,10 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                                 style="width: 30%"
                             />
                             <figcaption style="font-size: 0.3em; color: #aaa">
-                                Rust logo, CC-BY
+                                Logo-ul Rust, CC-BY
                             </figcaption>
                         </figure>
                     </div>
-                </section>
-
-                <section>
-                    <h3>Bonus: Copernicus Satellites</h3>
-                    <ul>
-                        <li>Sentinel-1: land and ocean</li>
-                        <li>Sentinel-2: land</li>
-                        <li>Sentinel-3: ocean and land</li>
-                        <li>Sentinel-5P: atmosphere</li>
-                        <li>Sentinel-6: sea level (altimetry)</li>
-                        <li>Sentinel-4: air quality</li>
-                        <li>Sentinel-5: meteorology</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Bonus: Grayscale NDVI</h3>
-                    <figure>
-                        <img
-                            src="images/s2-ndvi.png"
-                            style="max-height: 30vh; object-fit: contain"
-                        />
-                    </figure>
-                    <figcaption style="font-size: 0.3em; color: #aaa">
-                        Sentinel-2 NDVI, 35TMK, 2024-06-23
-                    </figcaption>
-                </section>
-                <section>
-                    <h3>Bonus: NDVI Composite @ 100%</h3>
-                    <figure>
-                        <img
-                            src="images/s2-ndvi-composite-zoom.png"
-                            style="max-height: 30vh; object-fit: contain"
-                        />
-                    </figure>
-                    <figcaption style="font-size: 0.3em; color: #aaa">
-                        Sentinel-2 NDVI composite, 35TMK, 2024-04-14,
-                        2024-07-08, 2024-10-26, 100% zoom
-                    </figcaption>
                 </section>
                 <section>
                     <div style="display: flex; align-items: center; gap: 0em">
@@ -1038,9 +1131,9 @@ fn ndvi(b4: i16, b8: i16, scl: u8) -> f32 {
                                     />
                                 </svg>
                                 <a
-                                    href="https://github.com/lnicola/omniopencon2025"
+                                    href="https://github.com/lnicola/geo-spatial-rust-2025"
                                     target="_blank"
-                                    >https://github.com/lnicola/omniopencon2025</a
+                                    >https://github.com/lnicola/geo-spatial-rust-2025</a
                                 >
                             </p>
                             <p>
