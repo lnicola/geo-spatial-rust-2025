@@ -67,7 +67,6 @@
                     <ul>
                         <li>Proiect personal al lui Graydon Hoare (2006)</li>
                         <li>Adoptat de Mozilla (2009)</li>
-                        <li>Anunțat oficial (2010)</li>
                         <li><em>Self-hosted</em> din 2011</li>
                         <li><em>Garbage-collected</em> până în 2013</li>
                         <li>Versiunea 1.0 (stabilă) a apărut în mai 2015</li>
@@ -94,8 +93,9 @@
                             <li class="fragment">Firefox, Chrome</li>
                             <li class="fragment">Windows, Linux, Android</li>
                             <li class="fragment">
-                                Amazon, Google, Meta, Discord, Canonical,
-                                Huawei, npm, &hellip;
+                                Amazon (AWS Lambda), Microsoft (Azure Boost),
+                                Google, Meta, Discord, Canonical, Huawei,
+                                OpenAI, npm, &hellip;
                             </li>
                         </ul>
                     </ul>
@@ -136,7 +136,7 @@
                                 href="https://intellij-rust.github.io/"
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                >IntelliJ</a
+                                >JetBrains</a
                             >,
                             <a
                                 href="https://zed.dev/"
@@ -208,7 +208,7 @@
                         </li>
                         <li>
                             Tipurile sunt verificate la compilarea programului
-                            (similar cu C, nu Python)
+                            (similar cu C fără conversii implicite, nu Python)
                         </li>
                         <li>
                             Operațiile au nevoie de tipuri de date compatibile
@@ -226,7 +226,7 @@
                     <ul>
                         <li>
                             <code class="language-rust">i8</code>,
-                            <code class="language-rust">u8</code>, &hellip;
+                            <code class="language-rust">u8</code>, &hellip;,
                             <code class="language-rust">f32</code>,
                             <code class="language-rust">f64</code>,
                             <code class="language-rust">char</code>
@@ -263,7 +263,7 @@
                     </ul>
                 </section>
                 <section>
-                    <h3>Structuri și <em>traits</em></h3>
+                    <h3>Structuri, <em>traits</em></h3>
                     <ul>
                         <li>
                             Ca sintaxă, structurile sunt asemănătoare claselor
@@ -359,7 +359,7 @@
                             <code class="language-python">NameError</code>, ci
                             și erori de logică
                         </li>
-                        <li>Fără<sup>*</sup> <code>SIGSEGV</code> &c.</li>
+                        <li>Fără<sup>*</sup> <code>SIGSEGV</code> etc.</li>
                     </ul>
                     <div
                         class="fragment"
@@ -389,6 +389,12 @@
                         <li class="fragment">
                             Accesele la <em>array</em>-uri și vectori sunt
                             verificate
+                            <ul clas="fragment">
+                                <li>
+                                    Pot fi evitate folosind iteratori și anumite
+                                    idiomuri
+                                </li>
+                            </ul>
                         </li>
                         <li class="fragment">
                             Tipurile de date declară explicit dacă pot fi mutate
@@ -635,7 +641,7 @@
                     <ul>
                         <li>
                             Vegetația este verde, dar la fel pot părea și apa,
-                            umbrele, acoperișurile &c.
+                            umbrele, acoperișurile etc.
                         </li>
                         <li class="fragment">De ce sunt plantele verzi?</li>
                         <li class="fragment">Ce înseamnă verde?</li>
@@ -737,22 +743,23 @@
                         <ul style="flex: 45%; font-size: 0.5em">
                             <li>Arată vegetația activă fotosintetic</li>
                             <li>
-                                -1&ndash;1, valorile negative puțin interesante
+                                Valori în -1..1, cele negative mai puțin
+                                interesante
                             </li>
                             <li>
-                                Fără vegetație
+                                Fără vegetație:
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="inline"
                                 >
                                     <mo>∼</mo><mn>0.2</mn> </math
-                                >, vegetație rară
+                                >, vegetație rară:
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="inline"
                                 >
                                     <mo>∼</mo><mn>0.3</mn> </math
-                                >, vegetație densă
+                                >, vegetație densă:
                                 <math
                                     xmlns="http://www.w3.org/1998/Math/MathML"
                                     display="inline"
